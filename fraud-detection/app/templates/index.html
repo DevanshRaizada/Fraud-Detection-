@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="High-Velocity Fraud Detection Dashboard - Real-time transaction monitoring powered by XGBoost, LightGBM, and LSTM models">
+    <title>FraudShield | Real-Time Fraud Detection</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <!-- Background Effects -->
+    <div class="bg-grid"></div>
+    <div class="bg-glow bg-glow-1"></div>
+    <div class="bg-glow bg-glow-2"></div>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="header-left">
+            <div class="logo">
+                <div class="logo-icon">
+                    <svg viewBox="0 0 32 32" fill="none">
+                        <path d="M16 2L28 8V24L16 30L4 24V8L16 2Z" stroke="currentColor" stroke-width="2" fill="none"/>
+                        <path d="M16 10L22 13V19L16 22L10 19V13L16 10Z" fill="currentColor" opacity="0.6"/>
+                        <circle cx="16" cy="16" r="3" fill="currentColor"/>
+                    </svg>
+                </div>
+                <div>
+                    <h1>FraudShield</h1>
+                    <span class="header-subtitle">Real-Time Fraud Detection Engine</span>
+                </div>
+            </div>
+        </div>
+        <div class="header-right">
+            <div class="status-badge" id="systemStatus">
+                <span class="status-dot"></span>
+                <span>System Online</span>
+            </div>
+            <div class="header-stat">
+                <span class="header-stat-value" id="totalProcessed">0</span>
+                <span class="header-stat-label">Processed</span>
+            </div>
+            <div class="header-stat">
+                <span class="header-stat-value" id="fraudDetected">0</span>
+                <span class="header-stat-label">Blocked</span>
+            </div>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <!-- Model Performance Cards -->
+        <section class="section">
+            <h2 class="section-title">
+                <span class="section-icon">⚡</span>
+                Model Performance
+            </h2>
+            <div class="model-cards" id="modelCards">
+                <!-- XGBoost Card -->
+                <div class="model-card" data-model="xgboost">
+                    <div class="model-card-header">
+                        <div class="model-badge xgboost">XGB</div>
+                        <h3>XGBoost</h3>
+                        <span class="model-type">Gradient Boosted Trees</span>
+                    </div>
+                    <div class="model-metrics">
+                        <div class="metric">
+                            <span class="metric-label">AUC-ROC</span>
+                            <span class="metric-value" id="xgb-auc">-</span>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-label">Precision</span>
+                            <span class="metric-value" id="xgb-precision">-</span>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-label">Recall</span>
+                            <span class="metric-value" id="xgb-recall">-</span>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-label">F1 Score</span>
+                            <span class="metric-value" id="xgb-f1">-</span>
+                        </div>
+                    </div>
+                    <div class="latency-bar">
+                        <span class="latency-label">Latency (p95)</span>
+                        <div class="latency-track">
+                            <div class="latency-fill" id="xgb-latency-bar"></div>
+                        </div>
+                        <span class="latency-value" id="xgb-latency">-</span>
+                    </div>
+                </div>
+
+                <!-- LightGBM Card -->
+                <div class="model-card" data-model="lightgbm">
+                    <div class="model-card-header">
+                        <div class="model-badge lightgbm">LGB</div>
+                        <h3>LightGBM</h3>
+                        <span class="model-type">Histogram Gradient Boosting</span>
+                    </div>
+                    <div class="model-metrics">
+                        <div class="metric">
+                            <span class="metric-label">AUC-ROC</span>
+                            <span class="metric-value" id="lgb-auc">-</span>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-label">Precision</span>
+                            <span class="metric-value" id="lgb-precision">-</span>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-label">Recall</span>
+                            <span class="metric-value" id="lgb-recall">-</span>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-label">F1 Score</span>
+                            <span class="metric-value" id="lgb-f1">-</span>
+                        </div>
+                    </div>
+                    <div class="latency-bar">
+                        <span class="latency-label">Latency (p95)</span>
+                        <div class="latency-track">
+                            <div class="latency-fill" id="lgb-latency-bar"></div>
+                        </div>
+                        <span class="latency-value" id="lgb-latency">-</span>
+                    </div>
+                </div>
+
+                <!-- LSTM Card -->
+                <div class="model-card" data-model="lstm">
+                    <div class="model-card-header">
+                        <div class="model-badge lstm">LSTM</div>
+                        <h3>LSTM Network</h3>
+                        <span class="model-type">Deep Sequential Learning</span>
+                    </div>
+                    <div class="model-metrics">
+                        <div class="metric">
+                            <span class="metric-label">AUC-ROC</span>
+                            <span class="metric-value" id="lstm-auc">-</span>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-label">Precision</span>
+                            <span class="metric-value" id="lstm-precision">-</span>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-label">Recall</span>
+                            <span class="metric-value" id="lstm-recall">-</span>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-label">F1 Score</span>
+                            <span class="metric-value" id="lstm-f1">-</span>
+                        </div>
+                    </div>
+                    <div class="latency-bar">
+                        <span class="latency-label">Latency (p95)</span>
+                        <div class="latency-track">
+                            <div class="latency-fill" id="lstm-latency-bar"></div>
+                        </div>
+                        <span class="latency-value" id="lstm-latency">-</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Transaction Simulator -->
+        <section class="section">
+            <h2 class="section-title">
+                <span class="section-icon">🔍</span>
+                Transaction Simulator
+            </h2>
+            <div class="simulator-container">
+                <div class="simulator-controls">
+                    <button class="btn btn-primary" id="btnSimulate" onclick="simulateTransaction()">
+                        <span class="btn-icon">▶</span>
+                        Simulate Transaction
+                    </button>
+                    <button class="btn btn-secondary" id="btnAutoSimulate" onclick="toggleAutoSimulate()">
+                        <span class="btn-icon">⟳</span>
+                        Auto-Simulate
+                    </button>
+                    <div class="speed-control">
+                        <label for="simSpeed">Speed</label>
+                        <input type="range" id="simSpeed" min="200" max="3000" value="1000" step="100">
+                        <span id="speedLabel">1.0s</span>
+                    </div>
+                </div>
+
+                <!-- Decision Display -->
+                <div class="decision-panel" id="decisionPanel">
+                    <div class="decision-waiting">
+                        <div class="pulse-ring"></div>
+                        <span>Awaiting Transaction</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Live Transaction Feed -->
+        <section class="section">
+            <h2 class="section-title">
+                <span class="section-icon">📡</span>
+                Live Transaction Feed
+            </h2>
+            <div class="feed-container" id="transactionFeed">
+                <div class="feed-empty">
+                    <span>No transactions yet. Click "Simulate Transaction" to begin.</span>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <span>FraudShield v1.0 — High-Velocity Fraud Detection Engine</span>
+        <span>XGBoost · LightGBM · LSTM · Sub-2ms Inference</span>
+    </footer>
+
+    <script src="/static/app.js"></script>
+</body>
+</html>
